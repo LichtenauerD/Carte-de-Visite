@@ -37,6 +37,34 @@ h1 span{color:var(--gold);display:block}
 .btn.primary{background:var(--gold);border-color:var(--gold);color:var(--bg)}
 .btn.primary svg{stroke:var(--bg)}
 .btn.primary:hover{background:#D8BC82}
+
+.btn.secondary{background:rgba(201,169,106,.14);border-color:var(--gold)}
+.btn.secondary:hover{background:rgba(201,169,106,.24)}
+button.btn{width:100%;font:inherit;text-align:left;cursor:pointer}
+button.btn .chev{margin-left:auto;transition:transform .2s}
+button.btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tiles .btn{min-height:56px;padding:10px 14px;gap:12px}
+.tiles .btn .l{font-size:15px}
+.tiles .btn.wide{grid-column:1/-1}
+.panel{border:1px solid rgba(201,169,106,.45);border-radius:14px;background:rgba(18,30,54,.92);padding:18px}
+.panel p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.5}
+.field{display:block;margin:0 0 12px}
+.field>span{display:block;font-size:13px;font-weight:600;margin:0 0 6px;letter-spacing:.02em}
+.field input,.field textarea{width:100%;font:400 16px/1.4 'Montserrat',system-ui,sans-serif;color:var(--text);background:rgba(11,20,38,.9);border:1px solid rgba(201,169,106,.4);border-radius:10px;padding:12px 14px;min-height:48px}
+.field textarea{min-height:84px;resize:vertical}
+.field input:focus,.field textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+.hint,.legal{font-size:12.5px!important;color:var(--muted);margin:0 0 12px!important}
+.send{width:100%;min-height:52px;border:0;border-radius:12px;background:var(--gold);color:var(--bg);font:700 16px 'Montserrat',sans-serif;cursor:pointer}
+.send:disabled{opacity:.6;cursor:default}
+.send:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+.msg{margin:12px 0 0!important;font-size:14px!important;line-height:1.5}
+.msg.err{color:#F2B8A8}
+.msg a{color:var(--gold)}
+.ok{text-align:center;padding:8px 0}
+.ok strong{display:block;font-size:17px;margin:0 0 6px;color:var(--gold)}
+.honey{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+.actions{gap:12px}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -57,35 +85,72 @@ h1 span{color:var(--gold);display:block}
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></svg>
 <span class="t"><span class="l" data-fr="Ajouter aux contacts" data-en="Save to contacts">Ajouter aux contacts</span></span>
 </a>
+<button type="button" class="btn secondary" id="leaveBtn" aria-expanded="false" aria-controls="leavePanel" hidden>
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+<span class="t"><span class="l" data-fr="Laisser mes coordonnées" data-en="Leave my details">Laisser mes coordonnées</span><span class="s" data-fr="Je vous recontacte rapidement" data-en="I will get back to you shortly">Je vous recontacte rapidement</span></span>
+<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+</button>
+<div class="panel" id="leavePanel" hidden>
+<form id="leaveForm" novalidate>
+<label class="field"><span data-fr="Nom et prénom *" data-en="Full name *">Nom et prénom *</span><input type="text" name="name" autocomplete="name" required></label>
+<label class="field"><span data-fr="E-mail" data-en="Email">E-mail</span><input type="email" name="email" autocomplete="email" inputmode="email"></label>
+<label class="field"><span data-fr="Téléphone" data-en="Phone">Téléphone</span><input type="tel" name="phone" autocomplete="tel" inputmode="tel"></label>
+<p class="hint" data-fr="Un e-mail ou un téléphone, au moins un des deux." data-en="An email or a phone number, at least one.">Un e-mail ou un téléphone, au moins un des deux.</p>
+<label class="field"><span data-fr="Message (facultatif)" data-en="Message (optional)">Message (facultatif)</span><textarea name="message" rows="3"></textarea></label>
+<input class="honey" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
+<p class="legal" data-fr="Ces informations me sont envoyées uniquement pour vous recontacter." data-en="This information is sent to me only so that I can get back to you.">Ces informations me sont envoyées uniquement pour vous recontacter.</p>
+<button type="submit" class="send" id="sendBtn" data-fr="Envoyer" data-en="Send">Envoyer</button>
+<p class="msg err" id="formErr" role="alert" hidden></p>
+</form>
+<div class="ok" id="formOk" role="status" hidden>
+<strong data-fr="Merci, c'est bien reçu." data-en="Thank you, received.">Merci, c'est bien reçu.</strong>
+<span data-fr="Je reviens vers vous rapidement." data-en="I will get back to you shortly.">Je reviens vers vous rapidement.</span>
+</div>
+</div>
+<div class="tiles" id="tiles">
 <a class="btn" href="mailto:dlicht@ik.me">
 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
-<span class="t"><span class="l" data-fr="Envoyer un e-mail" data-en="Send an email">Envoyer un e-mail</span><span class="s">dlicht@ik.me</span></span>
+<span class="t"><span class="l" data-fr="E-mail" data-en="Email">E-mail</span></span>
 </a>
 <a class="btn" href="https://wa.me/33762451059" target="_blank" rel="noopener">
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5Z"/></svg>
-<span class="t"><span class="l" data-fr="Écrire sur WhatsApp" data-en="Message on WhatsApp">Écrire sur WhatsApp</span><span class="s">+33 7 62 45 10 59</span></span>
+<span class="t"><span class="l">WhatsApp</span></span>
 </a>
 <a class="btn" href="https://www.linkedin.com/in/dorian-lichtenauer-5571a0315/" target="_blank" rel="noopener">
 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 11v5M8 8v.01M12 16v-5M12 13a2.5 2.5 0 0 1 5 0v3"/></svg>
-<span class="t"><span class="l" data-fr="Voir mon profil LinkedIn" data-en="View my LinkedIn profile">Voir mon profil LinkedIn</span><span class="s">dorian-lichtenauer</span></span>
+<span class="t"><span class="l">LinkedIn</span></span>
+</a>
+<a class="btn" id="cv" href="#" target="_blank" rel="noopener" hidden>
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+<span class="t"><span class="l" data-fr="Voir mon CV" data-en="View my CV">Voir mon CV</span></span>
 </a>
 <a class="btn" id="portfolio" href="#" target="_blank" rel="noopener" hidden>
 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></svg>
-<span class="t"><span class="l" data-fr="Voir mon portfolio" data-en="View my portfolio">Voir mon portfolio</span></span>
+<span class="t"><span class="l" data-fr="Mon portfolio" data-en="My portfolio">Mon portfolio</span></span>
 </a>
+</div>
 </nav>
 </main>
 <script>
-// Réglages: mettez ici l'adresse de votre portfolio quand il sera en ligne.
-// Tant que c'est vide, le bouton Portfolio reste masqué.
-var CONFIG = { portfolio: "" };
+// Réglages. Tant qu'une valeur est vide, le bouton correspondant reste masqué.
+//  formKey  : clé d'accès Web3Forms (reçue par e-mail sur web3forms.com)
+//  cv       : nom du fichier PDF du CV envoyé dans le dépôt GitHub
+//  portfolio: adresse du portfolio
+var CONFIG = { formKey: "4dc01dc2-7f2e-40af-b4fa-8000ca554ff3", cv: "CV-Dorian-Lichtenauer.pdf", portfolio: "" };
 
 (function () {
+  var MAIL = "dlicht@ik.me";
   var titles = {
     fr: "Dorian Lichtenauer, Urbaniste & Cartographe",
     en: "Dorian Lichtenauer, Urban Planner & Cartographer"
   };
+  var lang = "fr";
+  var errText = {
+    fr: { need: "Merci d'indiquer votre nom et au moins un e-mail ou un téléphone.", bad: "L'adresse e-mail semble incorrecte.", fail: "L'envoi a échoué. Vous pouvez m'écrire directement : ", sending: "Envoi…", send: "Envoyer" },
+    en: { need: "Please enter your name and at least an email or a phone number.", bad: "The email address looks incorrect.", fail: "Sending failed. You can write to me directly: ", sending: "Sending…", send: "Send" }
+  };
   function setLang(l) {
+    lang = l;
     document.documentElement.lang = l;
     document.title = titles[l];
     var nodes = document.querySelectorAll("[data-fr]");
@@ -93,15 +158,74 @@ var CONFIG = { portfolio: "" };
     var btns = document.querySelectorAll(".lang button");
     for (var j = 0; j < btns.length; j++) btns[j].setAttribute("aria-pressed", btns[j].getAttribute("data-set") === l ? "true" : "false");
   }
-  var btns = document.querySelectorAll(".lang button");
-  for (var k = 0; k < btns.length; k++) {
-    btns[k].addEventListener("click", function () { setLang(this.getAttribute("data-set")); });
+  var lb = document.querySelectorAll(".lang button");
+  for (var k = 0; k < lb.length; k++) {
+    lb[k].addEventListener("click", function () { setLang(this.getAttribute("data-set")); });
   }
-  if (CONFIG.portfolio) {
-    var p = document.getElementById("portfolio");
-    p.href = CONFIG.portfolio;
-    p.hidden = false;
+
+  function $(id) { return document.getElementById(id); }
+  if (CONFIG.cv) { $("cv").href = CONFIG.cv; $("cv").hidden = false; }
+  if (CONFIG.portfolio) { $("portfolio").href = CONFIG.portfolio; $("portfolio").hidden = false; }
+  // Si le nombre de tuiles visibles est impair, la dernière prend toute la largeur.
+  var tiles = $("tiles").children, vis = [];
+  for (var t = 0; t < tiles.length; t++) if (!tiles[t].hidden) vis.push(tiles[t]);
+  if (vis.length % 2 === 1) vis[vis.length - 1].className += " wide";
+
+  // Formulaire "Laisser mes coordonnées"
+  var leaveBtn = $("leaveBtn"), panel = $("leavePanel"), form = $("leaveForm");
+  if (CONFIG.formKey) {
+    leaveBtn.hidden = false;
+    leaveBtn.addEventListener("click", function () {
+      var open = panel.hidden;
+      panel.hidden = !open;
+      leaveBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) { var f = form.elements.name; if (f && !$("formOk").offsetParent) f.focus(); }
+    });
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var err = $("formErr"), send = $("sendBtn");
+      err.hidden = true; err.textContent = "";
+      var d = {
+        name: form.elements.name.value.trim(),
+        email: form.elements.email.value.trim(),
+        phone: form.elements.phone.value.trim(),
+        message: form.elements.message.value.trim()
+      };
+      if (form.elements.botcheck.checked) return;
+      if (!d.name || (!d.email && !d.phone)) { err.textContent = errText[lang].need; err.hidden = false; return; }
+      if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email)) { err.textContent = errText[lang].bad; err.hidden = false; return; }
+      send.disabled = true; send.textContent = errText[lang].sending;
+      var payload = {
+        access_key: CONFIG.formKey,
+        subject: "Nouveau contact via ta carte : " + d.name,
+        from_name: "Carte de visite",
+        name: d.name, email: d.email, phone: d.phone, message: d.message,
+        langue: lang
+      };
+      if (!d.email) delete payload.email;
+      var fallback = function () {
+        var body = "Nom : " + d.name + "\nE-mail : " + d.email + "\nTéléphone : " + d.phone + "\n\n" + d.message;
+        var a = document.createElement("a");
+        a.href = "mailto:" + MAIL + "?subject=" + encodeURIComponent("Contact depuis la carte") + "&body=" + encodeURIComponent(body);
+        a.textContent = MAIL;
+        err.textContent = errText[lang].fail; err.appendChild(a); err.hidden = false;
+        send.disabled = false; send.textContent = errText[lang].send;
+      };
+      var ctl = ("AbortController" in window) ? new AbortController() : null;
+      var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 12000);
+      fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(payload),
+        signal: ctl ? ctl.signal : undefined
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        clearTimeout(timer);
+        if (j && j.success) { form.hidden = true; $("formOk").hidden = false; }
+        else fallback();
+      }).catch(function () { clearTimeout(timer); fallback(); });
+    });
   }
+
   var nav = (navigator.language || "fr").toLowerCase();
   if (/[?&]lang=fr/.test(location.search)) setLang("fr");
   else if (/[?&]lang=en/.test(location.search) || nav.indexOf("fr") !== 0) setLang("en");
