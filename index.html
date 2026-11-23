@@ -47,6 +47,10 @@ button.btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .tiles .btn{min-height:56px;padding:10px 14px;gap:12px}
 .tiles .btn .l{font-size:15px}
 .tiles .btn.wide{grid-column:1/-1}
+.btn.amber{background:#E8A33D;border-color:#E8A33D;color:#0B1426;justify-content:center;min-height:52px}
+.btn.amber svg{stroke:#0B1426}
+.btn.amber:hover{background:#F2B455;border-color:#F2B455}
+.btn.amber .l{font-weight:700}
 .panel{border:1px solid rgba(201,169,106,.45);border-radius:14px;background:rgba(18,30,54,.92);padding:18px}
 .panel p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.5}
 .field{display:block;margin:0 0 12px}
@@ -54,6 +58,7 @@ button.btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .field input,.field textarea{width:100%;font:400 16px/1.4 'Montserrat',system-ui,sans-serif;color:var(--text);background:rgba(11,20,38,.9);border:1px solid rgba(201,169,106,.4);border-radius:10px;padding:12px 14px;min-height:48px}
 .field textarea{min-height:84px;resize:vertical}
 .field input:focus,.field textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+.legal summary{cursor:pointer;text-decoration:underline}.legal details p,details.legal p{margin:6px 0 0!important}
 .hint,.legal{font-size:12.5px!important;color:var(--muted);margin:0 0 12px!important}
 .send{width:100%;min-height:52px;border:0;border-radius:12px;background:var(--gold);color:var(--bg);font:700 16px 'Montserrat',sans-serif;cursor:pointer}
 .send:disabled{opacity:.6;cursor:default}
@@ -99,6 +104,7 @@ button.btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
 <label class="field"><span data-fr="Message (facultatif)" data-en="Message (optional)">Message (facultatif)</span><textarea name="message" rows="3"></textarea></label>
 <input class="honey" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
 <p class="legal" data-fr="Ces informations me sont envoyées uniquement pour vous recontacter." data-en="This information is sent to me only so that I can get back to you.">Ces informations me sont envoyées uniquement pour vous recontacter.</p>
+<details class="legal"><summary data-fr="Informations sur vos données personnelles" data-en="Information about your personal data">Informations sur vos données personnelles</summary><p data-fr="Responsable : Dorian Lichtenauer. Finalité : vous recontacter suite à votre demande (base légale : votre consentement, donné en envoyant ce formulaire). Destinataire : moi seul ; le message transite par le prestataire d'envoi Web3Forms (États-Unis), qui le conserve 30 jours au plus. Durée : vos données sont supprimées de ma messagerie au plus tard 12 mois après notre dernier échange. Vos droits (accès, rectification, effacement, opposition) : dlicht@ik.me. Réclamation possible auprès de la CNIL. Ce site n'utilise ni cookies ni outil de mesure d'audience." data-en="Controller: Dorian Lichtenauer. Purpose: to get back to you about your request (legal basis: your consent, given by submitting this form). Recipient: me only; the message goes through the sending provider Web3Forms (United States), which keeps it for 30 days at most. Retention: your data is deleted from my mailbox no later than 12 months after our last exchange. Your rights (access, rectification, erasure, objection): dlicht@ik.me. You may lodge a complaint with the CNIL. This site uses no cookies and no analytics.">Responsable : Dorian Lichtenauer. Finalité : vous recontacter suite à votre demande (base légale : votre consentement, donné en envoyant ce formulaire). Destinataire : moi seul ; le message transite par le prestataire d'envoi Web3Forms (États-Unis), qui le conserve 30 jours au plus. Durée : vos données sont supprimées de ma messagerie au plus tard 12 mois après notre dernier échange. Vos droits (accès, rectification, effacement, opposition) : dlicht@ik.me. Réclamation possible auprès de la CNIL. Ce site n'utilise ni cookies ni outil de mesure d'audience.</p></details>
 <button type="submit" class="send" id="sendBtn" data-fr="Envoyer" data-en="Send">Envoyer</button>
 <p class="msg err" id="formErr" role="alert" hidden></p>
 </form>
@@ -124,7 +130,7 @@ button.btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
 <span class="t"><span class="l" data-fr="Voir mon CV" data-en="View my CV">Voir mon CV</span></span>
 </a>
-<a class="btn" id="portfolio" href="#" target="_blank" rel="noopener" hidden>
+<a class="btn wide amber" id="portfolio" href="#" target="_blank" rel="noopener" hidden>
 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></svg>
 <span class="t"><span class="l" data-fr="Mon portfolio" data-en="My portfolio">Mon portfolio</span></span>
 </a>
@@ -136,7 +142,7 @@ button.btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
 //  formKey  : clé d'accès Web3Forms (reçue par e-mail sur web3forms.com)
 //  cv       : nom du fichier PDF du CV envoyé dans le dépôt GitHub
 //  portfolio: adresse du portfolio
-var CONFIG = { formKey: "4dc01dc2-7f2e-40af-b4fa-8000ca554ff3", cv: "CV-Dorian-Lichtenauer.pdf", portfolio: "" };
+var CONFIG = { formKey: "4dc01dc2-7f2e-40af-b4fa-8000ca554ff3", cv: "CV-Dorian-Lichtenauer.pdf", portfolio: "Portfolio-Dorian-Lichtenauer.pdf" };
 
 (function () {
   var MAIL = "dlicht@ik.me";
