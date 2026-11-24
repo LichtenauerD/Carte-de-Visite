@@ -591,7 +591,7 @@ addEventListener('keydown',function(e){if(lb.hidden)return;if(e.key==='Escape')c
 var O2=3070;
 var ST=[[0,0,4200,2970],[120,660,1540,940],[1720,660,1540,940],[120,1660,1540,940],[1720,1660,1540,940],[0,O2,4200,2970],[120,O2+360,3140,940],[3300,O2+360,780,1270],[120,O2+1310,3140,1340],[3300,O2+1660,780,940],[3320,140,760,1110],[3320,1230,760,1000],[3300,2210,800,680]];
 var ZF=[-1,5,0,1,2,-1,4,3,6,7,-1,-1,-1];
-var CMD=['_ZOOM _ÉTENDU  planche 01','_ZOOM _FENÊTRE  détail 1, analyse de site','_ZOOM _FENÊTRE  détail 2, lire le territoire','_ZOOM _FENÊTRE  détail 3, étudier les mobilités','_ZOOM _FENÊTRE  détail 4, étudier l\'espace public','_PAN  planche 02, études complémentaires','_ZOOM _FENÊTRE  détail 5, cartographier les réseaux','_ZOOM _FENÊTRE  détail 6, analyser les données','_ZOOM _FENÊTRE  détail 7, stationnement','_ZOOM _FENÊTRE  détail 8, tourisme','_TABLEAU  synthèse, repères 01 à 03','_TABLEAU  synthèse, repères 04 à 06','_VISA  cartouche, contact'];
+var CMD=['_ZOOM _ÉTENDU  planche 01','_ZOOM _FENÊTRE  détail 1, analyse de site','_ZOOM _FENÊTRE  détail 2, lire le territoire','_ZOOM _FENÊTRE  détail 3, étudier les mobilités','_ZOOM _FENÊTRE  détail 4, étudier l\'espace public','_PAN  planche 02, études complémentaires','_ZOOM _FENÊTRE  détail 5, cartographier les réseaux','_ZOOM _FENÊTRE  détail 6, analyser les données','_ZOOM _FENÊTRE  détail 7, stationnement','_ZOOM _FENÊTRE  détail 8, tourisme','_TABLEAU  synthèse, repères 01 à 03','_TABLEAU  synthèse, repères 04 à 06','_ZOOM _FENÊTRE  cartouche, contact'];
 var NAMES=["Planche 01",'Analyse de site','Lire le territoire','Étudier les mobilités','Étudier l\'espace public','Planche 02','Cartographier les réseaux','Analyser les données','Stationnement','Tourisme','Synthèse','Synthèse','Contact'];
 var TOCL=['P1','D1','D2','D3','D4','P2','D5','D6','D7','D8','S1','S2','Fin'];
 var N=ST.length,W,H,mobile,DUR=RM?1:1800;
@@ -667,7 +667,7 @@ function frame(now){
     var s=Math.exp(Math.log(from.s)*(1-e)+Math.log(to.s)*e)*(1-dip*Math.sin(Math.PI*e));
     cam={cx:from.cx+(to.cx-from.cx)*e,cy:from.cy+(to.cy-from.cy)*e,s:s,g:to.g,i:p<.5?from.i:to.i};
     ee=e;
-    if(p>=1){anim=false;cam=to;if(cur===N-1)stampAt=now}
+    if(p>=1){anim=false;cam=to}
   }
   var g=cam.g,vx=cam.cx-(g.x+g.w/2)/cam.s,vy=cam.cy-(g.y+g.h/2)/cam.s;
   sv.setAttribute('viewBox',vx.toFixed(2)+' '+vy.toFixed(2)+' '+(W/cam.s).toFixed(2)+' '+(H/cam.s).toFixed(2));
