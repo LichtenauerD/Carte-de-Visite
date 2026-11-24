@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dorian Lichtenauer · Planche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Idée : une planche A0 de bureau d'études, tracée en doré sur bleu nuit comme la carte de visite, et parcourue scène par scène comme dans un logiciel de DAO. */
+:root{
+  --bg:#0B1426; --sheet:#0E1930; --panel:#121E36; --gold:#C9A96A; --gold-2:#E3CB98; --text:#F2EEE6; --muted:#A3ADBF;
+  --ink:#E6E1D5; --line:rgba(201,169,106,.22);
+  --sans:'Montserrat','Helvetica Neue',Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --pw:410px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+#sv{position:fixed;inset:0;width:100vw;height:100vh;display:block;z-index:0;touch-action:none}
+
+/* traits de la planche */
+.ln{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ln.th{stroke-width:1.2;opacity:.45}
+.ln.bold{stroke-width:5}
+.ln.red{stroke:var(--gold)}
+.ln.dash{stroke-dasharray:14 10}
+.ln.dot{stroke-dasharray:2 9}
+.td{font-family:var(--sans);font-weight:800;letter-spacing:.02em;fill:var(--ink)}
+.tb{font-family:var(--sans);font-weight:600;fill:var(--ink)}
+.tm{font-family:var(--mono);fill:var(--ink);letter-spacing:.06em}
+.tm.mut{fill:var(--muted)}
+.tm.red,.td.red{fill:var(--gold)}
+.otx{font-family:var(--sans);font-weight:800;letter-spacing:.04em;fill:none;stroke:var(--gold);stroke-width:2.6}
+.plateimg{cursor:zoom-in}
+.ink{stroke-dasharray:1 1;stroke-dashoffset:1;animation:draw 1.6s cubic-bezier(.6,0,.2,1) forwards;animation-delay:var(--d,0s)}
+.fade{opacity:0;animation:fade .9s ease forwards;animation-delay:var(--d,0s)}
+.otx{stroke-dasharray:2600;stroke-dashoffset:2600;animation:drawT 2.8s cubic-bezier(.5,0,.2,1) forwards .5s}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes drawT{to{stroke-dashoffset:0}}
+@keyframes fade{to{opacity:1}}
+.flow{stroke-dasharray:10 16;animation:flow 1.6s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-26}}
+.shake{animation:shake .34s ease-out}
+@keyframes shake{25%{transform:translate(-5px,3px)}50%{transform:translate(4px,-2px)}75%{transform:translate(-2px,1px)}}
+
+/* barre DAO */
+.bar{position:fixed;z-index:5;left:0;right:var(--pw);height:42px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 18px;font-family:var(--mono);font-size:12px;letter-spacing:.05em;color:var(--muted);background:rgba(11,20,38,.88);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.bar b{font-weight:500;color:var(--text)}
+.bar .file{display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .file i{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;background:var(--gold);color:var(--bg);font-style:normal;font-family:Georgia,serif;font-weight:700;font-size:14px}
+.bar .xy{white-space:nowrap;font-variant-numeric:tabular-nums}
+.cmd{position:fixed;z-index:5;left:0;right:var(--pw);bottom:0;height:44px;display:flex;align-items:center;gap:10px;padding:0 18px;font-family:var(--mono);font-size:13px;color:var(--text);background:rgba(11,20,38,.9);border-top:1px solid var(--line)}
+.cmd span{color:var(--gold)}
+.cmd output{white-space:nowrap;overflow:hidden}
+.cmd output:after{content:"";display:inline-block;width:8px;height:15px;margin-left:3px;vertical-align:-2px;background:var(--gold);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+#xh,#xv{position:fixed;z-index:4;pointer-events:none;background:rgba(201,169,106,.5);opacity:0;transition:opacity .2s}
+#xh{left:0;right:var(--pw);height:1px}
+#xv{top:42px;bottom:44px;width:1px}
+#pick{position:fixed;z-index:4;pointer-events:none;width:14px;height:14px;margin:-7px 0 0 -7px;border:1px solid var(--gold);opacity:0;transition:opacity .2s}
+body.cad #xh,body.cad #xv,body.cad #pick{opacity:1}
+body.cad #sv{cursor:none}
+
+/* colonne de légende */
+#panel{position:fixed;z-index:6;top:0;right:0;bottom:0;width:var(--pw);background:var(--panel);border-left:1px solid rgba(201,169,106,.45);display:flex;flex-direction:column}
+#panel .ph{flex:none;display:flex;justify-content:space-between;align-items:center;height:42px;padding:0 22px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+#panel .ph b{color:var(--gold);font-weight:500}
+#cards{position:relative;flex:1;min-height:0}
+.card{position:absolute;inset:0;padding:30px 26px 18px;overflow:auto;opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .5s ease,transform .7s cubic-bezier(.2,.7,.2,1),visibility 0s linear .5s}
+.card.on{opacity:1;visibility:visible;transform:none;transition:opacity .7s ease .35s,transform .9s cubic-bezier(.2,.7,.2,1) .35s,visibility 0s}
+.ref{margin:0 0 12px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.card h1,.card h2{margin:0;font-weight:700;line-height:1.08;letter-spacing:-.01em;color:var(--text)}
+.card h1{font-size:34px}
+.card h2{font-size:32px}
+.card h1 em,.card h2 em{font-style:normal;color:var(--gold)}
+.kick{margin:10px 0 0;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.lead{margin:16px 0 0;font-size:15px;color:#D9DCE3;text-wrap:pretty}
+.who{margin:18px 0 0;padding:14px 0 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.7;color:var(--muted)}
+.who b{color:var(--text);font-weight:600}
+.pl{list-style:none;margin:18px 0 0;padding:0;border-top:1px solid var(--line)}
+.pl button{all:unset;box-sizing:border-box;cursor:zoom-in;width:100%;display:flex;gap:12px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px;font-weight:500}
+.pl button span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--gold);min-width:34px}
+.pl button em{font-style:normal;margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.pl button:hover{color:var(--gold-2)}
+.figs{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:16px 0 0;background:var(--line);border:1px solid var(--line)}
+.figs div{background:var(--panel);padding:10px 12px}
+.figs b{display:block;font-weight:700;font-size:21px;line-height:1.1;color:var(--gold-2)}
+.figs small{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.tools{margin:14px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.btns{display:grid;gap:8px;margin:18px 0 0}
+.btns a{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(201,169,106,.5);border-radius:10px;text-decoration:none;font-weight:600;transition:background .2s,color .2s}
+.btns a small{font-family:var(--mono);font-weight:400;font-size:11.5px;color:var(--muted)}
+.btns a.main{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.btns a.main small{color:var(--bg)}
+.btns a:hover{background:var(--gold-2);border-color:var(--gold-2);color:var(--bg)}
+.btns a:hover small{color:var(--bg)}
+/* sommaire et navigation */
+#toc{flex:none;display:grid;grid-template-columns:repeat(13,1fr);border-top:1px solid var(--line)}
+#toc button{all:unset;cursor:pointer;text-align:center;padding:9px 0 10px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;color:var(--muted);border-right:1px solid var(--line)}
+#toc button:last-child{border-right:0}
+#toc button[aria-current="true"]{color:var(--bg);background:var(--gold)}
+#toc button:hover{color:var(--gold-2)}
+#toc button[aria-current="true"]:hover{color:var(--bg)}
+.pnav{flex:none;display:grid;grid-template-columns:1fr auto 1.3fr;align-items:center;gap:10px;padding:12px 16px 14px;border-top:1px solid var(--line)}
+.pnav button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 14px;border-radius:12px;font-weight:600;font-size:14px;transition:background .2s,color .2s,opacity .2s}
+#prev{border:1px solid rgba(201,169,106,.45);color:var(--text)}
+#prev:hover{border-color:var(--gold);color:var(--gold-2)}
+#prev[disabled]{opacity:.3;cursor:default}
+#next{background:var(--gold);color:var(--bg)}
+#next:hover{background:var(--gold-2)}
+#next i{display:inline-block;transition:transform .2s}
+#next:hover i{transform:translateX(3px)}
+#pos{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+#pos b{color:var(--text);font-weight:500}
+.hint{position:fixed;z-index:5;left:calc((100vw - var(--pw))/2);bottom:64px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:99px;background:rgba(18,30,54,.9);border:1px solid rgba(201,169,106,.45);font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--gold-2);transition:opacity .6s;pointer-events:none;white-space:nowrap}
+.hint i{width:14px;height:22px;border:1.5px solid var(--gold);border-radius:8px;position:relative}
+.hint i:after{content:"";position:absolute;left:50%;top:4px;width:2px;height:5px;margin-left:-1px;background:var(--gold-2);border-radius:1px;animation:wheel 1.6s ease-in-out infinite}
+@keyframes wheel{60%{transform:translateY(7px);opacity:0}}
+.hint.off{opacity:0}
+
+/* visionneuse */
+#lb{position:fixed;inset:0;z-index:20;background:rgba(6,11,22,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 16px 24px}
+#lb[hidden]{display:none}
+#lb img{max-width:min(94vw,1500px);max-height:76vh;display:block;border:1px solid rgba(201,169,106,.5);border-radius:4px}
+#lb p{margin:0;max-width:72ch;text-align:center;color:var(--text);font-size:14.5px}
+#lb p span{font-family:var(--mono);color:var(--gold);margin-right:8px}
+#lb button{all:unset;cursor:pointer;position:absolute;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text);padding:12px 15px;border:1px solid rgba(201,169,106,.45);border-radius:10px}
+#lb button:hover{background:var(--gold);color:var(--bg)}
+#lb .x{top:14px;right:14px}#lb .pv{left:14px;top:50%}#lb .nx{right:14px;top:50%}
+
+@media (max-width:899px){
+  :root{--pw:0px}
+  .bar{right:0;font-size:11px}
+  .bar .c{display:none}
+  .cmd,#xh,#xv,#pick,#toc{display:none}
+  #panel{top:auto;left:0;width:auto;height:48vh;border-left:0;border-top:1px solid rgba(201,169,106,.5);border-radius:16px 16px 0 0}
+  #panel .ph{display:none}
+  .card{padding:18px 18px 12px}
+  .card h1{font-size:26px}.card h2{font-size:25px}
+  .lead{font-size:14.5px;margin-top:10px}
+  .pnav{padding:10px 12px 12px}
+  .pnav button{height:46px}
+  .hint{left:50%;bottom:calc(48vh + 12px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .ink,.fade,.otx{animation:none;stroke-dashoffset:0;opacity:1}
+  .flow,.shake,.cmd output:after,.hint i:after{animation:none}
+  .card,.card.on{transition:none;transform:none}
+}
+</style>
+</head>
+<body>
+<svg id="sv" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 4200 2970"></svg>
+
+<header class="bar">
+  <div class="file"><i>D</i><b>LICHTENAUER_PORTFOLIO.dwg</b><span class="c">· Présentation A0</span></div>
+  <div class="xy"><span class="c" id="xy">X 0,0 · Y 0,0 · </span><span id="zm">Zoom 24 %</span></div>
+</header>
+<div class="cmd"><span>Commande :</span><output id="cmd"></output></div>
+<div id="xh"></div><div id="xv"></div><div id="pick"></div>
+<div class="hint" id="hint"><i></i>Défiler, glisser ou « Suite » pour avancer</div>
+
+<aside id="panel" aria-label="Lecture de la planche">
+  <div class="ph"><span>Légende de lecture</span><b id="pn">Vue d'ensemble</b></div>
+  <div id="cards">
+    <section class="card" data-i="0">
+      <p class="ref">Portfolio · Planche 01 / 02</p>
+      <h1>Cartographier, analyser, <em>proposer</em></h1>
+      <p class="lead">Une sélection de travaux réalisés pendant mon master et mes stages, présentée sur deux planches techniques. Chaque détail ouvre un travail : cartographie, mobilités, espace public, données.</p>
+      <p class="who"><b>Dorian Lichtenauer</b><br>Urbaniste &amp; cartographe<br>M2 Urbanisme et aménagement, Université de Strasbourg<br>Alternance 2026/2027</p>
+    </section>
+    <section class="card" data-i="1">
+      <p class="ref">Détail 1 / 8 · Cartographie</p>
+      <h2>Lire le <em>territoire</em></h2>
+      <p class="kick">Cartographie thématique</p>
+      <p class="lead">Motorisation des ménages en petite couronne, travailleurs transfrontaliers en Moselle, équipements de la Meuse, catégories socioprofessionnelles de la métropole de Toulouse.</p>
+      <ul class="pl"><li><button data-k="0"><span>P1.1</span>Motorisation et frontaliers<em>↗</em></button></li><li><button data-k="1"><span>P1.2</span>La Meuse et ses équipements<em>↗</em></button></li><li><button data-k="2"><span>P1.3</span>Toulouse, catégories socioprofessionnelles<em>↗</em></button></li></ul>
+      <p class="tools">QGIS · INSEE base IRIS</p>
+    </section>
+    <section class="card" data-i="2">
+      <p class="ref">Détail 2 / 8 · Transport collectif</p>
+      <h2>Étudier les <em>mobilités</em></h2>
+      <p class="kick">Offre de transport et fiche projet</p>
+      <p class="lead">Fréquence des bus FLUO selon la période, et une fiche projet de liaison à Saverne, avec un premier chiffrage.</p>
+      <div class="figs"><div><b>8,2 km</b><small>Longueur de la ligne</small></div><div><b>≈ 25 min</b><small>Temps de boucle</small></div><div><b>320 000 €</b><small>Deux navettes</small></div><div><b>150 000 €</b><small>Exploitation par an</small></div></div>
+      <ul class="pl"><li><button data-k="3"><span>P2.1</span>Fréquence des bus FLUO<em>↗</em></button></li><li><button data-k="4"><span>P2.2</span>Ligne E-Lico 2, Saverne<em>↗</em></button></li></ul>
+      <p class="tools">Données GTFS · Power BI</p>
+    </section>
+    <section class="card" data-i="3">
+      <p class="ref">Détail 3 / 8 · Espace public</p>
+      <h2>Étudier l'<em>espace public</em></h2>
+      <p class="kick">Plans, schémas et dossiers</p>
+      <p class="lead">Itinéraires piétons autour du pôle de Val-de-Fontenay, potentiel d'une ligne Illkirch-Lingolsheim à Strasbourg Sud, offre de stationnement à Trappes et à Saverne.</p>
+      <ul class="pl"><li><button data-k="5"><span>P3.1</span>Val-de-Fontenay<em>↗</em></button></li><li><button data-k="6"><span>P3.2</span>Strasbourg Sud et Trappes<em>↗</em></button></li><li><button data-k="7"><span>P3.3</span>Stationnement à Saverne<em>↗</em></button></li></ul>
+      <p class="tools">Plans et schémas · Visswalk</p>
+    </section>
+    <section class="card" data-i="4">
+      <p class="ref">Détail 4 / 8 · Analyse de données</p>
+      <h2>Analyser les <em>données</em></h2>
+      <p class="kick">Données mobiles et statistiques</p>
+      <p class="lead">Les déplacements entre intercommunalités en jour moyen annualisé et leur différentiel entre semaine et week-end, puis une typologie des communes bretonnes selon l'artificialisation.</p>
+      <ul class="pl"><li><button data-k="8"><span>P4.1</span>Flux inter-EPCI<em>↗</em></button></li><li><button data-k="9"><span>P4.2</span>Typologie des communes bretonnes<em>↗</em></button></li></ul>
+      <p class="tools">Données de téléphonie mobile · RStudio</p>
+    </section>
+    <section class="card">
+      <p class="ref">Planche 02 / 02</p>
+      <h2>Études <em>complémentaires</em></h2>
+      <p class="lead">Une seconde planche pour des travaux plus récents : une analyse de site en six couches, des cartes de réseau par département et un diagnostic de stationnement à l'IRIS.</p>
+    </section>
+    <section class="card">
+      <p class="ref">Détail 5 / 8 · Analyse de site</p>
+      <h2>Décomposer un <em>site</em></h2>
+      <p class="kick">Besançon, rayon de 1 150 m</p>
+      <p class="lead">Un site découpé en six couches superposées : transports collectifs, voirie, bâti, trame verte et bleue, relief, synthèse. Réalisée avec un outil d'analyse de site que j'ai développé en HTML / JavaScript.</p>
+      <div class="figs"><div><b>6</b><small>Couches thématiques</small></div><div><b>4 791</b><small>Bâtiments</small></div><div><b>104</b><small>Arrêts de tram et bus</small></div><div><b>59 km</b><small>De voies</small></div></div>
+      <ul class="pl"><li><button data-k="14"><span>P5.1</span>Besançon, analyse de site<em>↗</em></button></li></ul>
+      <p class="tools">OpenStreetMap · IGN BD TOPO · RGE ALTI</p>
+    </section>
+    <section class="card">
+      <p class="ref">Détail 6 / 8 · Réseaux</p>
+      <h2>Cartographier les <em>réseaux</em></h2>
+      <p class="kick">Lignes interurbaines par département</p>
+      <p class="lead">Les lignes de bus régionales et les lignes ferroviaires des Ardennes, de la Marne, de la Meuse et des Vosges, avec leurs connexions vers les territoires voisins.</p>
+      <ul class="pl"><li><button data-k="10"><span>P6.1</span>Ardennes (08)<em>↗</em></button></li><li><button data-k="11"><span>P6.2</span>Marne (51)<em>↗</em></button></li><li><button data-k="12"><span>P6.3</span>Meuse (55)<em>↗</em></button></li><li><button data-k="13"><span>P6.4</span>Vosges (88)<em>↗</em></button></li></ul>
+      <p class="tools">QGIS</p>
+    </section>
+    <section class="card">
+      <p class="ref">Détail 7 / 8 · Stationnement</p>
+      <h2>Diagnostiquer le <em>stationnement</em></h2>
+      <p class="kick">Offre et demande à l'IRIS</p>
+      <p class="lead">Comparer le nombre de voitures des ménages à l'offre réellement recensée, privée et publique, puis suivre le taux d'occupation par zone au fil de la journée.</p>
+      <ul class="pl"><li><button data-k="15"><span>P7.1</span>IRIS Van Gogh / Montaigne<em>↗</em></button></li><li><button data-k="16"><span>P7.2</span>IRIS Centre-Ouest<em>↗</em></button></li><li><button data-k="17"><span>P7.3</span>IRIS Cité Nouvelle Barbusse<em>↗</em></button></li><li><button data-k="18"><span>P7.4</span>Taux d'occupation par tranche horaire<em>↗</em></button></li></ul>
+      <p class="tools">INSEE IRIS · Inventaire de l'offre · QGIS</p>
+    </section>
+    <section class="card">
+      <p class="ref">Détail 8 / 8 · Tourisme</p>
+      <h2>Valoriser le <em>territoire</em></h2>
+      <p class="kick">Ardennes</p>
+      <p class="lead">Parc naturel régional, voie verte Trans-Ardennaise et principaux sites touristiques du département.</p>
+      <ul class="pl"><li><button data-k="19"><span>P8.1</span>Ardennes, sites touristiques<em>↗</em></button></li></ul>
+      <p class="tools">QGIS</p>
+    </section>
+    <section class="card" data-i="5">
+      <p class="ref">Synthèse 1 / 2</p>
+      <h2>Mes principales <em>études</em></h2>
+      <p class="lead">Six travaux menés en master et en stage, avec pour chacun ce que j'y ai mis en pratique. Repères 01 à 03 : le réseau FLUO Grand Est, le pôle de Val-de-Fontenay, le stationnement à Saverne.</p>
+    </section>
+    <section class="card" data-i="6">
+      <p class="ref">Synthèse 2 / 2</p>
+      <h2>Des sujets <em>variés</em></h2>
+      <p class="lead">Repères 04 à 06 : le cheminement Gare-Centre de Mulhouse, les coupures urbaines de la Presqu'île Malraux, l'enquête sur les 20 ans du tramway strasbourgeois.</p>
+    </section>
+    <section class="card" data-i="7">
+      <p class="ref">Cartouche · Contact</p>
+      <h2>Et <em>maintenant ?</em></h2>
+      <p class="lead">Merci d'avoir parcouru la planche. Je serais ravi d'en discuter avec vous.</p>
+      <div class="btns">
+        <a class="main" href="mailto:dlicht@ik.me">Me contacter<small>dlicht@ik.me</small></a>
+        <a href="https://lichtenauerd.github.io/Carte-de-Visite/CV-Dorian-Lichtenauer.pdf" target="_blank" rel="noopener">Voir le CV<small>PDF ↗</small></a>
+        <a href="https://lichtenauerd.github.io/Carte-de-Visite/Portfolio-Dorian-Lichtenauer.pdf" target="_blank" rel="noopener">Portfolio PDF<small>↗</small></a>
+        <a href="https://www.linkedin.com/in/dorian-lichtenauer-5571a0315/" target="_blank" rel="noopener">LinkedIn<small>↗</small></a>
+      </div>
+    </section>
+  </div>
+  <nav id="toc" aria-label="Sommaire de la planche"></nav>
+  <div class="pnav"><button type="button" id="prev" aria-label="Scène précédente">← Précédent</button><span id="pos"><b>1</b> / 8</span><button type="button" id="next" aria-label="Scène suivante">Suite <i>→</i></button></div>
+</aside>
+
+<div id="lb" hidden role="dialog" aria-modal="true" aria-label="Planche agrandie">
+  <button class="x" type="button" id="lbx">Fermer</button>
+  <button class="pv" type="button" id="lbp" aria-label="Planche précédente">‹</button>
+  <img id="lbi" alt="">
+  <p id="lbc"></p>
+  <button class="nx" type="button" id="lbn" aria-label="Planche suivante">›</button>
+</div>
+
+<script>
+(function(){
+"use strict";
+var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var NS='http://www.w3.org/2000/svg',sv=document.getElementById('sv');
+function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);(p||sv).appendChild(e);return e}
+function tx(x,y,s,cls,size,p,extra){var a={x:x,y:y,'class':cls,'font-size':size};if(extra)for(var k in extra)a[k]=extra[k];var e=el('text',a,p);e.textContent=s;return e}
+function R(x,y,w,h){return 'M'+x+' '+y+'H'+(x+w)+'V'+(y+h)+'H'+x+'Z'}
+function ink(d,cls,delay,p){return el('path',{d:d,'class':'ln ink '+(cls||''),pathLength:1,style:'--d:'+delay+'s'},p)}
+function fd(node,delay){node.setAttribute('class',(node.getAttribute('class')||'')+' fade');node.style.setProperty('--d',delay+'s');return node}
+function cl(v,a,b){return v<a?a:v>b?b:v}
+function sm(t){t=cl(t,0,1);return t*t*(3-2*t)}
+
+/* ---------- définitions ---------- */
+var defs=el('defs',{});
+var hp=el('pattern',{id:'hatch',width:16,height:16,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},defs);
+el('line',{x1:0,y1:0,x2:0,y2:16,stroke:'#E6E1D5','stroke-width':2,opacity:.3},hp);
+var hr=el('pattern',{id:'hatchr',width:12,height:12,patternUnits:'userSpaceOnUse',patternTransform:'rotate(-45)'},defs);
+el('line',{x1:0,y1:0,x2:0,y2:12,stroke:'#C9A96A','stroke-width':2.5,opacity:.7},hr);
+var gp=el('pattern',{id:'grid',width:100,height:100,patternUnits:'userSpaceOnUse'},defs);
+el('circle',{cx:0,cy:0,r:2,fill:'#E6E1D5',opacity:.16},gp);
+var fl=el('filter',{id:'stampf',x:'-10%',y:'-10%',width:'120%',height:'120%'},defs);
+el('feTurbulence',{type:'fractalNoise',baseFrequency:'.035',numOctaves:2,seed:3,result:'w'},fl);
+el('feDisplacementMap',{'in':'SourceGraphic',in2:'w',scale:7,xChannelSelector:'R',yChannelSelector:'G',result:'d'},fl);
+el('feTurbulence',{type:'fractalNoise',baseFrequency:'.75',numOctaves:2,seed:9,result:'n'},fl);
+el('feColorMatrix',{'in':'n',type:'matrix',values:'0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 2.05',result:'m'},fl);
+el('feComposite',{'in':'d',in2:'m',operator:'in'},fl);
+
+var sheet=el('g',{id:'sheet'});
+el('rect',{x:-3000,y:-3000,width:10200,height:8970,fill:'#0B1426'},sheet);
+el('rect',{x:30,y:30,width:4140,height:2910,fill:'#0E1930'},sheet);
+el('rect',{x:90,y:90,width:4020,height:2790,fill:'url(#grid)'},sheet);
+/* cadre et repères */
+ink(R(30,30,4140,2910),'th',0,sheet);
+ink(R(90,90,4020,2790),'bold',.1,sheet);
+for(var i=0;i<=12;i++){var x=90+335*i;ink('M'+x+' 30V90M'+x+' 2880V2940','th',.3+i*.03,sheet)}
+for(i=0;i<=8;i++){var y=90+348.75*i;ink('M30 '+y+'H90M4110 '+y+'H4170','th',.3+i*.03,sheet)}
+for(i=0;i<12;i++){var cx=90+335*(i+.5);fd(tx(cx,70,String(i+1),'tm mut',24,sheet,{'text-anchor':'middle'}),.6);fd(tx(cx,2920,String(i+1),'tm mut',24,sheet,{'text-anchor':'middle'}),.6)}
+var LET='ABCDEFGH';
+for(i=0;i<8;i++){var cy=90+348.75*(i+.5)+8;fd(tx(60,cy,LET[i],'tm mut',24,sheet,{'text-anchor':'middle'}),.6);fd(tx(4140,cy,LET[i],'tm mut',24,sheet,{'text-anchor':'middle'}),.6)}
+
+/* ---------- titre ---------- */
+var tg=el('g',{},sheet);
+fd(tx(140,345,'DORIAN','td',210,tg,{textLength:982,lengthAdjust:'spacingAndGlyphs'}),.4);
+tx(140,565,'LICHTENAUER','otx',210,tg,{textLength:1800,lengthAdjust:'spacingAndGlyphs'});
+ink('M2010 180V570','',.6,tg);
+fd(tx(2050,245,'URBANISTE & CARTOGRAPHE','td red',38,tg),.9);
+fd(tx(2050,305,'M2 Urbanisme et aménagement','tm',25,tg),1.0);
+fd(tx(2050,345,'Université de Strasbourg','tm',25,tg),1.05);
+fd(tx(2050,385,'Alternance 2026/2027','tm',25,tg),1.1);
+fd(tx(2050,470,'PORTFOLIO · 2 PLANCHES · INDICE A','tm red',21,tg),1.2);
+fd(tx(2050,520,'Mobilités · cartographie · données','tm mut',21,tg),1.25);
+/* nord et échelle */
+var ng=el('g',{},sheet);
+ink('M3150 230m-58 0a58 58 0 1 0 116 0a58 58 0 1 0 -116 0','',.8,ng);
+el('path',{d:'M3150 168L3172 240H3128Z',fill:'#E6E1D5','class':'fade',style:'--d:1.3s'},ng);
+ink('M3150 292L3128 240H3172Z','th',1,ng);
+fd(tx(3150,330,'N','td',30,ng,{'text-anchor':'middle'}),1.3);
+for(i=0;i<4;i++){el('rect',{x:2930+i*75,y:490,width:75,height:16,fill:i%2?'#0E1930':'#C9A96A',stroke:'#E6E1D5','stroke-width':2,'class':'fade',style:'--d:'+(1.2+i*.08)+'s'},ng)}
+fd(tx(2930,475,'0','tm',20,ng),1.4);fd(tx(3230,475,'ÉCH. VARIABLE','tm',18,ng,{'text-anchor':'end'}),1.4);
+
+
+/* ---------- planche 02 ---------- */
+var O2=3070;
+el('rect',{x:30,y:O2+30,width:4140,height:2910,fill:'#0E1930'},sheet);
+el('rect',{x:90,y:O2+90,width:4020,height:2790,fill:'url(#grid)'},sheet);
+ink(R(30,O2+30,4140,2910),'th',0,sheet);
+ink(R(90,O2+90,4020,2790),'bold',.1,sheet);
+for(i=0;i<=12;i++){x=90+335*i;ink('M'+x+' '+(O2+30)+'V'+(O2+90)+'M'+x+' '+(O2+2880)+'V'+(O2+2940),'th',.3,sheet)}
+for(i=0;i<=8;i++){y=O2+90+348.75*i;ink('M30 '+y+'H90M4110 '+y+'H4170','th',.3,sheet)}
+for(i=0;i<12;i++){cx=90+335*(i+.5);tx(cx,O2+70,String(i+1),'tm mut',24,sheet,{'text-anchor':'middle'});tx(cx,O2+2920,String(i+1),'tm mut',24,sheet,{'text-anchor':'middle'})}
+for(i=0;i<8;i++){cy=O2+90+348.75*(i+.5)+8;tx(60,cy,LET[i],'tm mut',24,sheet,{'text-anchor':'middle'});tx(4140,cy,LET[i],'tm mut',24,sheet,{'text-anchor':'middle'})}
+var tg2=el('g',{},sheet);
+tx(140,O2+290,'PLANCHE 02','td',150,tg2);
+ink('M1130 '+(O2+160)+'V'+(O2+300),'',.6,tg2);
+tx(1170,O2+215,'ÉTUDES COMPLÉMENTAIRES','td red',38,tg2);
+tx(1170,O2+268,'Analyse de site · réseaux départementaux · stationnement','tm',25,tg2);
+tx(4060,O2+215,'DORIAN LICHTENAUER','td',30,tg2,{'text-anchor':'end'});
+tx(4060,O2+268,'PLANCHE 02 / 02 · INDICE A','tm red',21,tg2,{'text-anchor':'end'});
+tx(140,O2+2790,'SOURCES · INSEE · GTFS · OPENSTREETMAP · IGN BD TOPO · RGE ALTI','tm mut',20,tg2);
+ink('M140 '+(O2+2740)+'H4060','th',.4,tg2);
+
+/* ---------- zones de détail ---------- */
+var D=[
+ {n:1,x:140,y:680,w:1500,h:900,t:'LIRE LE TERRITOIRE',m:'QGIS · INSEE IRIS'},
+ {n:2,x:1740,y:680,w:1500,h:900,t:'ÉTUDIER LES MOBILITÉS',m:'GTFS · POWER BI'},
+ {n:3,x:140,y:1680,w:1500,h:900,t:'ÉTUDIER L\'ESPACE PUBLIC',m:'PLANS · VISSWALK'},
+ {n:4,x:1740,y:1680,w:1500,h:900,t:'ANALYSER LES DONNÉES',m:'DONNÉES MOBILES · RSTUDIO'},
+ {n:6,x:140,y:O2+380,w:3100,h:880,t:'CARTOGRAPHIER LES RÉSEAUX',m:'QGIS · LIGNES INTERURBAINES ET FERROVIAIRES'},
+ {n:5,x:3320,y:O2+380,w:740,h:1230,t:'ANALYSE DE SITE',m:''},
+ {n:7,x:140,y:O2+1330,w:3100,h:1300,t:'DIAGNOSTIQUER LE STATIONNEMENT',m:'INSEE IRIS · INVENTAIRE DE L\'OFFRE · QGIS'},
+ {n:8,x:3320,y:O2+1680,w:740,h:900,t:'TOURISME',m:''}
+];
+var zones=[],brk=[];
+D.forEach(function(d,k){
+  var g=el('g',{},sheet);zones.push(g);var dl=.7+k*.15;
+  ink('M'+(d.x+50)+' '+(d.y+46)+'m-42 0a42 42 0 1 0 84 0a42 42 0 1 0 -84 0','bold',dl,g);
+  fd(tx(d.x+50,d.y+62,String(d.n),'td',44,g,{'text-anchor':'middle'}),dl+.4);
+  fd(tx(d.x+112,d.y+64,d.t,'td',46,g),dl+.3);
+  if(d.m)fd(tx(d.x+d.w,d.y+64,d.m,'tm mut',20,g,{'text-anchor':'end'}),dl+.5);
+  ink('M'+(d.x+92)+' '+(d.y+90)+'H'+(d.x+d.w),'',dl+.2,g);
+  var b=el('g',{opacity:0},sheet);brk.push(b);
+  var x0=d.x-20,y0=d.y-20,x1=d.x+d.w+20,y1=d.y+d.h+20,L=60;
+  el('path',{d:'M'+x0+' '+(y0+L)+'V'+y0+'H'+(x0+L)+'M'+(x1-L)+' '+y0+'H'+x1+'V'+(y0+L)+'M'+x1+' '+(y1-L)+'V'+y1+'H'+(x1-L)+'M'+(x0+L)+' '+y1+'H'+x0+'V'+(y1-L),'class':'ln red bold'},b);
+});
+
+/* ---------- planches ---------- */
+var PL=[
+ {id:'equip',z:0,x:140,y:800,w:840,h:420,r:'P1.1',s:'Motorisation et frontaliers',c:"Équipement automobile des ménages (petite couronne parisienne, IRIS) et taux de travailleurs transfrontaliers (Moselle, IRIS)"},
+ {id:'meuse',z:0,x:1010,y:800,w:290,h:367,r:'P1.2',s:'La Meuse',c:"Meuse : principales villes, équipements, cours d'eau, parc naturel régional et réseau ferré"},
+ {id:'toulouse',z:0,x:1330,y:800,w:253,h:367,r:'P1.3',s:'Toulouse, CSP',c:"Répartition des principales catégories socioprofessionnelles dans la métropole de Toulouse (INSEE, base IRIS 2020)"},
+ {id:'fluo',z:1,x:1740,y:800,w:840,h:420,r:'P2.1',s:'Fréquence des bus FLUO',c:"Fréquence des bus FLUO, scolaire / vacances / dimanche (données GTFS traitées avec Power BI)"},
+ {id:'elico',z:1,x:2620,y:800,w:600,h:300,r:'P2.2',s:'Ligne E-Lico 2, Saverne',c:"Fiche projet, ligne E-Lico 2, Saverne : création d'une liaison Haut-Barr / Gare / Martelberg"},
+ {id:'valdef',z:2,x:140,y:1800,w:700,h:350,r:'P3.1',s:'Val-de-Fontenay',c:"Val-de-Fontenay : étude en amont des travaux du pôle multimodal pour préparer des itinéraires piétons sécurisés"},
+ {id:'sud',z:2,x:900,y:1800,w:700,h:350,r:'P3.2',s:'Strasbourg Sud et Trappes',c:"Strasbourg secteur Sud (potentiel d'une future ligne Illkirch-Lingolsheim) et Trappes (offre de stationnement public et privé)"},
+ {id:'stat',z:2,x:140,y:2190,w:560,h:280,r:'P3.3',s:'Stationnement, Saverne',c:"Saverne : état des lieux du stationnement"},
+ {id:'flux',z:3,x:1740,y:1800,w:840,h:420,r:'P4.1',s:'Flux inter-EPCI',c:"Flux journaliers inter-EPCI, deux sens confondus, jour moyen annualisé et différentiel semaine / week-end (données mobiles)"},
+ {id:'typo',z:3,x:2620,y:1800,w:600,h:300,r:'P4.2',s:'Typologie, Bretagne',c:"Typologie des communes bretonnes selon le taux d'artificialisation et plusieurs variables (RStudio)"},
+ {id:'08',z:4,x:140,y:O2+500,w:660,h:660,r:'P6.1',s:'Ardennes (08)',c:"Réseau interurbain des Ardennes (08) : lignes de bus régionales, lignes ferroviaires et connexions vers les territoires voisins"},
+ {id:'51',z:4,x:846,y:O2+500,w:847,h:660,r:'P6.2',s:'Marne (51)',c:"Réseau interurbain de la Marne (51) : lignes de bus régionales, lignes ferroviaires et connexions vers les territoires voisins"},
+ {id:'55',z:4,x:1739,y:O2+500,w:422,h:660,r:'P6.3',s:'Meuse (55)',c:"Réseau interurbain de la Meuse (55) : lignes de bus régionales, lignes ferroviaires et connexions vers les territoires voisins"},
+ {id:'88',z:4,x:2207,y:O2+500,w:1031,h:660,r:'P6.4',s:'Vosges (88)',c:"Réseau interurbain des Vosges (88) : lignes de bus régionales, lignes ferroviaires et connexions vers les territoires voisins"},
+ {id:'besancon',z:5,x:3320,y:O2+500,w:740,h:1046,r:'P5.1',s:'Besançon, 6 couches',c:"Analyse de site à Besançon, rayon de 1 150 m : six couches thématiques en axonométrie (OpenStreetMap, IGN BD TOPO, RGE ALTI), réalisée avec un outil d'analyse de site développé en HTML / JavaScript"},
+ {id:'montaigne',z:6,x:140,y:O2+1450,w:928,h:560,r:'P7.1',s:'IRIS Montaigne',c:"Adéquation entre offre et demande de stationnement, IRIS Van Gogh / Montaigne : 925 ménages, 1 045 voitures, 560 places privées et 570 places publiques"},
+ {id:'centreouest',z:6,x:1110,y:O2+1450,w:923,h:560,r:'P7.2',s:'IRIS Centre-Ouest',c:"Adéquation entre offre et demande de stationnement, IRIS Centre-Ouest : 1 374 ménages, 1 339 voitures, 769 places privées et 652 places publiques"},
+ {id:'barbusse',z:6,x:2075,y:O2+1450,w:859,h:560,r:'P7.3',s:'Cité Barbusse',c:"Adéquation entre offre et demande de stationnement, IRIS Cité Nouvelle Barbusse : 937 ménages, 662 voitures, 700 places privées et 630 places publiques"},
+ {id:'occup',z:6,x:2976,y:O2+1450,w:264,h:560,r:'P7.4',s:'Occupation',c:"Taux d'occupation moyen du stationnement par zone et par tranche horaire, d'avant 8 h à après 19 h"},
+ {id:'tourisme',z:7,x:3320,y:O2+1800,w:740,h:740,r:'P8.1',s:'Ardennes, tourisme',c:"Ardennes : parc naturel régional, voie verte Trans-Ardennaise et principaux sites touristiques"}
+];
+PL.forEach(function(p,k){
+  var g=zones[p.z],dl=1.1+k*.09;
+  el('rect',{x:p.x,y:p.y,width:p.w,height:p.h,fill:'url(#hatch)'},g);
+  var im=el('image',{x:p.x,y:p.y,width:p.w,height:p.h,preserveAspectRatio:'xMidYMid slice','class':'plateimg fade',style:'--d:'+(dl+.5)+'s'},g);
+  im.setAttribute('href','img/'+p.id+'.jpg');
+  im.addEventListener('click',function(){openLb(k)});
+  ink(R(p.x,p.y,p.w,p.h),'',dl,g);
+  fd(tx(p.x,p.y+p.h+34,p.r,'tm red',20,g),dl+.6);
+  fd(tx(p.x+66,p.y+p.h+34,p.s,'tm',20,g),dl+.6);
+});
+
+/* détail 1 : emboîtement des échelles et courbes */
+(function(g){
+  var S=[[260,'RÉGION'],[200,'DÉPARTEMENT'],[145,'EPCI'],[95,'COMMUNE'],[50,'IRIS']];
+  S.forEach(function(s,k){var top=1560-s[0];ink(R(160,top,s[0],s[0]),k===4?'red':'',1.4+k*.1,g);ink('M'+(160+s[0])+' '+top+'H432','th',1.6+k*.1,g);fd(tx(440,top+8,s[1],'tm',19,g),1.8+k*.1)});
+  if(true){var last=1560-50;el('rect',{x:160,y:last,width:50,height:50,fill:'url(#hatchr)','class':'fade',style:'--d:2.2s'},g)}
+  for(var r=1;r<=7;r++){var pts=[];for(var a=0;a<=64;a++){var t=a/64*6.2832,rx=62*r*(1+.12*Math.sin(3*t+r)+.05*Math.sin(5*t-r)),ry=rx*.3;pts.push((1120+Math.cos(t)*rx).toFixed(1)+' '+(1440+Math.sin(t)*ry).toFixed(1))}
+    ink('M'+pts.join('L')+'Z',r%3===0?'':'th',1.5+r*.08,g)}
+  ink('M640 1440H1600','red dash',2.1,g);
+  [[640,'A'],[1600,'A']].forEach(function(a){ink('M'+a[0]+' 1440m-20 0a20 20 0 1 0 40 0a20 20 0 1 0 -40 0','red',2.2,g);fd(tx(a[0],1447,a[1],'tm red',20,g,{'text-anchor':'middle'}),2.4)});
+  fd(tx(640,1575,'LECTURE MULTISCALAIRE, COUPE A-A','tm mut',18,g),2.3);
+})(zones[0]);
+
+/* détail 2 : ligne E-Lico 2, schéma de boucle */
+var loop,bus;
+(function(g){
+  fd(tx(2620,1180,'2 NAVETTES · 320 000 €','tm red',23,g),1.9);
+  fd(tx(2620,1222,'EXPLOITATION · 150 000 € / AN','tm red',23,g),2.0);
+  var d='M1800 1410C1960 1300 2250 1320 2450 1345S2960 1330 3160 1420C3060 1510 2640 1495 2450 1478S1960 1510 1800 1410Z';
+  loop=ink(d,'bold',1.6,g);
+  el('path',{d:d,'class':'ln red flow',style:'stroke-width:3'},g);
+  [[1800,1410,'HAUT-BARR',1360],[2450,1345,'GARE',1311],[3160,1420,'MARTELBERG',1365]].forEach(function(s,k){
+    el('circle',{cx:s[0],cy:s[1],r:16,fill:'#0E1930',stroke:'#E6E1D5','stroke-width':5,'class':'fade',style:'--d:'+(2+k*.1)+'s'},g);
+    fd(tx(k===0?s[0]-20:k===2?s[0]+20:s[0],s[3],s[2],'td',24,g,{'text-anchor':k===0?'start':k===2?'end':'middle'}),2.1+k*.1)});
+  bus=el('rect',{x:-14,y:-9,width:28,height:18,rx:4,fill:'#C9A96A','class':'fade',style:'--d:2.4s'},g);
+  ink('M1800 1550H3160M1800 1532V1568M3160 1532V1568','',2.2,g);
+  el('path',{d:'M1800 1550l22 -8v16zM3160 1550l-22 -8v16z',fill:'#E6E1D5','class':'fade',style:'--d:2.5s'},g);
+  el('rect',{x:2250,y:1530,width:400,height:40,fill:'#0E1930'},g);
+  fd(tx(2450,1559,'8,2 KM · BOUCLE ≈ 25 MIN','tm',22,g,{'text-anchor':'middle'}),2.5);
+})(zones[1]);
+
+/* détail 3 : coupe de trottoir et piétons */
+var peds=[],pedG;
+(function(g){
+  el('rect',{x:760,y:2195,width:860,height:55,fill:'url(#hatch)','class':'fade',style:'--d:1.6s'},g);
+  ink('M760 2250H1620','bold',1.6,g);
+  ink('M760 2420H1620','',1.7,g);
+  ink('M760 2490H1620','th dash',1.8,g);
+  el('rect',{x:1150,y:2335,width:150,height:85,fill:'url(#hatchr)','class':'fade',style:'--d:2s'},g);
+  ink(R(1150,2335,150,85),'red',1.9,g);
+  ink('M800 2250V2420M788 2250H812M788 2420H812','',2.1,g);
+  fd(tx(830,2342,'LARGEUR UTILE','tm',17,g),2.2);
+  ink('M1225 2250V2335M1213 2250H1237M1213 2335H1237','red',2.2,g);
+  fd(tx(1312,2310,'RÉSIDUELLE','tm red',17,g),2.3);
+  fd(tx(1310,2405,'AMÉNAGEMENT TEMPORAIRE','tm red',15,g),2.3);
+  fd(tx(760,2540,'CAPACITÉ DU TROTTOIR · MODÉLISATION VISSWALK','tm mut',18,g),2.4);
+  pedG=el('g',{'class':'fade',style:'--d:2.3s'},g);
+  for(var k=0;k<28;k++){var lane=2268+((k*37)%140);peds.push({x:760+(k*131)%860,lane:lane,v:22+(k*13)%18,c:el('circle',{r:6,fill:k%5?'#E6E1D5':'#C9A96A'},pedG)})}
+})(zones[2]);
+
+/* détail 4 : arcs de flux */
+(function(g){
+  var N=[[1790,2510],[2050,2470],[2330,2515],[2600,2465],[2880,2505],[3170,2480]];
+  var A=[[0,2,0],[1,3,1],[2,5,0],[0,4,1],[3,5,0],[1,4,1],[0,5,0],[2,4,1]];
+  A.forEach(function(a,k){var p=N[a[0]],q=N[a[1]],dd=Math.abs(q[0]-p[0]),h=Math.min(190,dd*.16+40);
+    var d='M'+p[0]+' '+p[1]+'Q'+((p[0]+q[0])/2)+' '+(Math.min(p[1],q[1])-h)+' '+q[0]+' '+q[1];
+    ink(d,a[2]?'red th':'th',1.7+k*.06,g);
+    el('path',{d:d,'class':'ln flow '+(a[2]?'red':''),style:'stroke-width:'+(2+((k*7)%4))+';animation-duration:'+(1.2+k*.17)+'s'},g)});
+  N.forEach(function(p,k){el('circle',{cx:p[0],cy:p[1],r:12,fill:'#E6E1D5','class':'fade',style:'--d:'+(1.9+k*.05)+'s'},g)});
+  fd(tx(2620,2196,'JOUR MOYEN ANNUALISÉ','tm',18,g),2.3);
+  ink('M3010 2190H3060','',2.3,g);
+  fd(tx(2620,2228,'DIFFÉRENTIEL SEMAINE / WEEK-END','tm red',18,g),2.3);
+  ink('M3150 2222H3200','red',2.3,g);
+})(zones[3]);
+
+
+/* détail 7 : offre et demande, IRIS Montaigne */
+(function(g){
+  var y0=O2+2140,k=1.15,x0=560;
+  tx(140,y0-40,'IRIS MONTAIGNE · OFFRE ET DEMANDE','tm red',20,g);
+  tx(140,y0+26,'VOITURES DES MÉNAGES','tm',19,g);
+  el('rect',{x:x0,y:y0,width:1045*k,height:38,fill:'#C9A96A','class':'fade',style:'--d:2s'},g);
+  tx(x0+1045*k+18,y0+28,'1 045','td',30,g);
+  tx(140,y0+116,'PLACES RECENSÉES','tm',19,g);
+  el('rect',{x:x0,y:y0+90,width:560*k,height:38,fill:'#E6E1D5','class':'fade',style:'--d:2.1s'},g);
+  el('rect',{x:x0+560*k,y:y0+90,width:570*k,height:38,fill:'url(#hatch)',stroke:'#E6E1D5','stroke-width':2,'class':'fade',style:'--d:2.2s'},g);
+  tx(x0+1130*k+18,y0+118,'1 130','td',30,g);
+  tx(x0,y0+170,'560 PRIVÉES','tm mut',18,g);tx(x0+560*k,y0+170,'570 PUBLIQUES','tm mut',18,g);
+  tx(140,y0+250,'925 MÉNAGES · 1,1 VOITURE PAR MÉNAGE · 527 VOITURES SANS PLACE PRIVÉE','tm mut',19,g);
+})(zones[6]);
+(function(g){tx(140,O2+1236,'4 DÉPARTEMENTS · 08 · 51 · 55 · 88','tm mut',19,g)})(zones[4]);
+
+/* ---------- nomenclature ---------- */
+var nm=el('g',{},sheet);
+fd(tx(3340,215,'NOMENCLATURE','td',46,nm),1.2);
+ink('M3340 238H4060','bold',1.2,nm);
+fd(tx(3340,275,'DES ÉTUDES','tm mut',20,nm),1.3);
+var COLS=['DIAGNOSTIC','DONNÉES','CARTOGRAPHIE','MODÉLISATION','PROPOSITIONS'];
+COLS.forEach(function(c,j){var x=3832+j*50;fd(tx(x,340,c,'tm',16,nm,{transform:'rotate(-90 '+x+' 340)'}),1.4)});
+var ITEMS=[
+ [['Équilibrage du réseau','FLUO Grand Est'],['Stage M1 · 08, 51, 55, 88','GTFS, données mobiles'],[1,1,1,0,1]],
+ [['Pôle multimodal','de Val-de-Fontenay'],['Capacité des trottoirs','Visswalk'],[1,0,0,1,1]],
+ [['Stationnement','à Saverne'],['Diagnostic territorial','pistes d\'amélioration'],[1,1,1,0,1]],
+ [['Cheminement Gare-','Centre, Mulhouse'],['Mobilités actives','requalification'],[1,0,1,0,1]],
+ [['Coupures urbaines,','ville archipel'],['Presqu\'île Malraux','Strasbourg'],[1,0,1,0,0]],
+ [['Les 20 ans du tramway','strasbourgeois'],['Enquête auprès des usagers','typologie sous RStudio'],[0,1,0,0,0]]
+];
+ITEMS.forEach(function(it,k){
+  var y0=370+k*300,dl=1.4+k*.12;
+  ink('M3340 '+(y0)+'H4060','th',dl,nm);
+  ink('M3372 '+(y0+52)+'m-28 0a28 28 0 1 0 56 0a28 28 0 1 0 -56 0','',dl,nm);
+  fd(tx(3372,y0+61,('0'+(k+1)),'tm',22,nm,{'text-anchor':'middle'}),dl+.2);
+  fd(tx(3420,y0+62,it[0][0],'tb',32,nm),dl+.2);
+  fd(tx(3420,y0+102,it[0][1],'tb',32,nm),dl+.25);
+  fd(tx(3420,y0+150,it[1][0],'tm mut',19,nm),dl+.3);
+  fd(tx(3420,y0+178,it[1][1],'tm mut',19,nm),dl+.3);
+  it[2].forEach(function(v,j){var x=3832+j*50-17;el('rect',{x:x-6,y:y0+38,width:34,height:34,fill:v?'#E6E1D5':'none',stroke:'#E6E1D5','stroke-width':2,'class':'fade',style:'--d:'+(dl+.35+j*.04)+'s'},nm)});
+});
+ink('M3340 2170H4060','bold',2,nm);
+el('rect',{x:3340,y:2190,width:22,height:22,fill:'#E6E1D5','class':'fade',style:'--d:2.1s'},nm);
+fd(tx(3374,2209,'MIS EN PRATIQUE','tm',17,nm),2.1);
+el('rect',{x:3640,y:2190,width:22,height:22,fill:'none',stroke:'#E6E1D5','stroke-width':2,'class':'fade',style:'--d:2.1s'},nm);
+fd(tx(3554+120,2209,'NON','tm',17,nm),2.1);
+
+/* ---------- légende des outils ---------- */
+var lg=el('g',{},sheet);
+fd(tx(140,2660,'LÉGENDE · OUTILS UTILISÉS','tm red',20,lg),1.6);
+ink('M140 2676H3240','',1.6,lg);
+var TOOLS=[['QGIS','cartographie'],['Power BI','tableaux de bord'],['RStudio','statistiques'],['GTFS','offre de transport'],['INSEE IRIS','socio-économie'],['Données mobiles','flux'],['Visswalk','piétons'],['HTML / JS','outils sur mesure']];
+TOOLS.forEach(function(t,k){
+  var x=140+k*388,y=2760,dl=1.8+k*.07,s;
+  if(k===0)s=ink('M'+x+' '+y+'H'+(x+70),'bold',dl,lg);
+  if(k===1){for(var b=0;b<4;b++)el('rect',{x:x+b*18,y:y-[18,34,26,44][b]+10,width:12,height:[18,34,26,44][b],fill:'#E6E1D5','class':'fade',style:'--d:'+dl+'s'},lg)}
+  if(k===2)ink('M'+x+' '+y+'H'+(x+70),'dot bold',dl,lg);
+  if(k===3){ink('M'+x+' '+y+'H'+(x+70),'red',dl,lg);[0,35,70].forEach(function(o){el('circle',{cx:x+o,cy:y,r:7,fill:'#0E1930',stroke:'#C9A96A','stroke-width':3,'class':'fade',style:'--d:'+dl+'s'},lg)})}
+  if(k===4)el('rect',{x:x,y:y-20,width:70,height:36,fill:'url(#hatch)',stroke:'#E6E1D5','stroke-width':2,'class':'fade',style:'--d:'+dl+'s'},lg);
+  if(k===5)ink('M'+x+' '+(y+12)+'Q'+(x+35)+' '+(y-34)+' '+(x+70)+' '+(y+12),'red bold',dl,lg);
+  if(k===6)[0,14,28,42,56,70].forEach(function(o,i){el('circle',{cx:x+o,cy:y+(i%2?-6:6),r:5,fill:'#E6E1D5','class':'fade',style:'--d:'+dl+'s'},lg)});
+  if(k===7)fd(tx(x,y+12,'</>','tm',34,lg),dl);
+  fd(tx(x+92,y+4,t[0],'tb',26,lg),dl+.2);
+  fd(tx(x+92,y+34,t[1],'tm mut',17,lg),dl+.25);
+});
+
+/* ---------- cartouche ---------- */
+var ct=el('g',{},sheet);
+ink(R(3340,2250,720,600),'bold',1.4,ct);
+ink('M3340 2340H4060M3340 2400H4060','',1.6,ct);
+fd(tx(3362,2312,'DORIAN LICHTENAUER','td red',34,ct),1.8);
+fd(tx(3362,2380,'Urbaniste & cartographe','tb',24,ct),1.9);
+var CELLS=[['OBJET',"Portfolio de travaux"],['FORMATION','M2 Urbanisme, Unistra'],['PHASE','Alternance 2026/2027'],['ÉCHELLE',"De l'IRIS à la région"],['INDICE','A'],['DATE','11 / 2026'],['PLANCHE','01 / 02'],['FORMAT','A0 numérique']];
+CELLS.forEach(function(c,k){var col=k%2,row=(k/2)|0,x=3340+col*360,y=2400+row*95;
+  if(col===0)ink('M3340 '+(y+95)+'H4060','th',1.7+row*.05,ct);
+  fd(tx(x+20,y+30,c[0],'tm mut',15,ct),1.9+k*.04);
+  fd(tx(x+20,y+70,c[1],'tb',k===0?25:23,ct,k===0?{fill:'#C9A96A'}:null),1.95+k*.04)});
+ink('M3700 2400V2780','th',1.7,ct);
+fd(tx(3362,2830,'lichtenauerd.github.io/Carte-de-Visite','tm',17,ct),2.2);
+
+/* tampon */
+var stamp=el('g',{opacity:0},sheet);
+var si=el('g',{filter:'url(#stampf)'},stamp);
+el('rect',{x:-290,y:-130,width:580,height:260,rx:10,fill:'none',stroke:'#C9A96A','stroke-width':10},si);
+el('rect',{x:-268,y:-108,width:536,height:216,rx:4,fill:'none',stroke:'#C9A96A','stroke-width':3},si);
+tx(0,-36,'VISA','td red',96,si,{'text-anchor':'middle'});
+tx(0,22,'BON POUR ÉCHANGE','td red',40,si,{'text-anchor':'middle'});
+tx(0,72,'ALTERNANCE · 2026 / 2027','tm red',24,si,{'text-anchor':'middle','font-weight':600});
+
+/* visionneuse */
+var lb=document.getElementById('lb'),lbi=document.getElementById('lbi'),lbc=document.getElementById('lbc'),lcur=0,opener=null;
+function openLb(k,from){lcur=(k+PL.length)%PL.length;var p=PL[lcur];lbi.src='img/'+p.id+'.jpg';lbi.alt=p.c;lbc.innerHTML='';var sp=document.createElement('span');sp.textContent=p.r;lbc.appendChild(sp);lbc.appendChild(document.createTextNode(p.c));if(lb.hidden){opener=from||document.activeElement}lb.hidden=false;document.getElementById('lbx').focus()}
+function closeLb(){lb.hidden=true;if(opener&&opener.focus)opener.focus()}
+[].slice.call(document.querySelectorAll('.pl button')).forEach(function(b){b.addEventListener('click',function(){openLb(+b.dataset.k,b)})});
+document.getElementById('lbx').addEventListener('click',closeLb);
+document.getElementById('lbp').addEventListener('click',function(){openLb(lcur-1)});
+document.getElementById('lbn').addEventListener('click',function(){openLb(lcur+1)});
+lb.addEventListener('click',function(e){if(e.target===lb)closeLb()});
+addEventListener('keydown',function(e){if(lb.hidden)return;if(e.key==='Escape')closeLb();if(e.key==='ArrowLeft')openLb(lcur-1);if(e.key==='ArrowRight')openLb(lcur+1)});
+
+/* ---------- scènes ---------- */
+var O2=3070;
+var ST=[[0,0,4200,2970],[120,660,1540,940],[1720,660,1540,940],[120,1660,1540,940],[1720,1660,1540,940],[0,O2,4200,2970],[3300,O2+360,780,1270],[120,O2+360,3140,940],[120,O2+1310,3140,1340],[3300,O2+1660,780,940],[3320,140,760,1110],[3320,1230,760,1000],[3300,2210,800,680]];
+var ZF=[-1,0,1,2,3,-1,5,4,6,7,-1,-1,-1];
+var CMD=['_ZOOM _ÉTENDU  planche 01','_ZOOM _FENÊTRE  détail 1, lire le territoire','_ZOOM _FENÊTRE  détail 2, étudier les mobilités','_ZOOM _FENÊTRE  détail 3, étudier l\'espace public','_ZOOM _FENÊTRE  détail 4, analyser les données','_PAN  planche 02, études complémentaires','_ZOOM _FENÊTRE  détail 5, analyse de site','_ZOOM _FENÊTRE  détail 6, cartographier les réseaux','_ZOOM _FENÊTRE  détail 7, stationnement','_ZOOM _FENÊTRE  détail 8, tourisme','_TABLEAU  synthèse, repères 01 à 03','_TABLEAU  synthèse, repères 04 à 06','_VISA  cartouche, contact'];
+var NAMES=["Planche 01",'Lire le territoire','Étudier les mobilités','Étudier l\'espace public','Analyser les données','Planche 02','Analyse de site','Cartographier les réseaux','Stationnement','Tourisme','Synthèse','Synthèse','Contact'];
+var TOCL=['P1','D1','D2','D3','D4','P2','D5','D6','D7','D8','S1','S2','Fin'];
+var N=ST.length,W,H,mobile,DUR=RM?1:1800;
+function region(){var pw=mobile?0:410;return mobile?{x:0,y:42,w:W,h:H*.52-42}:{x:0,y:42,w:W-pw,h:H-86}}
+function fit(i){var r=ST[i],g=region(),s=Math.min(g.w/r[2],g.h/r[3])*.92;return {cx:r[0]+r[2]/2,cy:r[1]+r[3]/2,s:s,g:g,i:i}}
+var cur=0,from=null,to=null,ta=0,anim=false,cam=null,stampAt=-1,stamped=false,dur=DUR;
+function resize(){W=innerWidth;H=innerHeight;mobile=W<900;var f=fit(cur);if(!anim)cam=f;else to=f}
+addEventListener('resize',resize);resize();
+
+var toc=document.getElementById('toc'),cards=[].slice.call(document.querySelectorAll('.card'));
+TOCL.forEach(function(n,i){var b=document.createElement('button');b.type='button';b.textContent=n;b.setAttribute('aria-label',NAMES[i]);b.addEventListener('click',function(){go(i)});toc.appendChild(b)});
+var tocB=[].slice.call(toc.children);
+var pn=document.getElementById('pn'),zm=document.getElementById('zm'),xy=document.getElementById('xy'),cmd=document.getElementById('cmd'),pos=document.getElementById('pos'),prev=document.getElementById('prev'),next=document.getElementById('next'),hint=document.getElementById('hint');
+var typing=null;
+function typeCmd(s){if(typing)clearInterval(typing);if(RM){cmd.textContent=s;return}var n=0;cmd.textContent='';typing=setInterval(function(){n+=2;cmd.textContent=s.slice(0,n);if(n>=s.length){clearInterval(typing);typing=null}},24)}
+function setUI(i){
+  cards.forEach(function(c,k){c.classList.toggle('on',k===i);if(k===i)c.scrollTop=0});
+  tocB.forEach(function(b,k){b.setAttribute('aria-current',k===i?'true':'false')});
+  pn.textContent=NAMES[i];pos.innerHTML='<b>'+(i+1)+'</b> / '+N;
+  prev.disabled=i===0;
+  next.innerHTML=i===N-1?'Revenir au début <i>↺</i>':(i===0?'Commencer <i>→</i>':'Suite <i>→</i>');
+  typeCmd(CMD[i]);
+}
+function go(i){
+  if(i<0||i>=N)return;
+  if(i===cur&&!anim)return;
+  from={cx:cam.cx,cy:cam.cy,s:cam.s,g:cam.g,i:cam.i};cur=i;to=fit(i);ta=performance.now();anim=true;
+  var dd=Math.hypot(to.cx-from.cx,to.cy-from.cy);dur=RM?1:DUR*(1+Math.min(dd/4500,.7));
+  if(i!==N-1){stampAt=-1;stamped=false}
+  setUI(i);hint.classList.add('off');
+}
+prev.addEventListener('click',function(){go(cur-1)});
+next.addEventListener('click',function(){go(cur===N-1?0:cur+1)});
+
+/* défilement : un geste = une scène */
+var lockUntil=0,acc=0,lastW=0;
+function scrollableCard(t){var c=t&&t.closest?t.closest('.card'):null;return c&&c.scrollHeight>c.clientHeight+2?c:null}
+addEventListener('wheel',function(e){
+  if(!lb.hidden)return;
+  var c=scrollableCard(e.target);
+  if(c){var top=c.scrollTop<=0,bot=c.scrollTop+c.clientHeight>=c.scrollHeight-1;if((e.deltaY<0&&!top)||(e.deltaY>0&&!bot))return}
+  e.preventDefault();
+  var now=performance.now();
+  if(now<lockUntil){lockUntil=Math.max(lockUntil,now+160);acc=0;return}
+  if(now-lastW>260)acc=0;lastW=now;acc+=e.deltaY+e.deltaX*.5;
+  if(Math.abs(acc)>30){go(cur+(acc>0?1:-1));acc=0;lockUntil=now+dur*.75}
+},{passive:false});
+var ty=null,tx0=null,tt=null;
+addEventListener('touchstart',function(e){if(!lb.hidden)return;ty=e.touches[0].clientY;tx0=e.touches[0].clientX;tt=e.target},{passive:true});
+addEventListener('touchend',function(e){if(ty===null)return;var dy=ty-e.changedTouches[0].clientY,dx=tx0-e.changedTouches[0].clientX;var c=scrollableCard(tt);ty=null;
+  if(c&&!(e.target.closest&&e.target.closest('#sv')))return;
+  if(Math.abs(dy)>48&&Math.abs(dy)>Math.abs(dx)*1.2){go(cur+(dy>0?1:-1))}
+  else if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.2&&!(tt.closest&&tt.closest('#panel'))){go(cur+(dx>0?1:-1))}
+},{passive:true});
+addEventListener('keydown',function(e){
+  if(!lb.hidden)return;
+  if(['ArrowDown','ArrowRight','PageDown',' '].indexOf(e.key)>=0){if(e.target.tagName==='BUTTON'&&e.key===' ')return;e.preventDefault();go(cur+1)}
+  else if(['ArrowUp','ArrowLeft','PageUp'].indexOf(e.key)>=0){e.preventDefault();go(cur-1)}
+  else if(e.key==='Home'){go(0)}else if(e.key==='End'){go(N-1)}
+});
+
+var mx=-1,my=-1,t0=performance.now();
+function ease(p){return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2}
+function fmt(v){return v.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1})}
+setUI(0);
+function frame(now){
+  var t=(now-t0)/1000,ee=1;
+  if(anim){
+    var p=cl((now-ta)/dur,0,1),e=ease(p);
+    var gm=to.g,dx=Math.abs(to.cx-from.cx),dy=Math.abs(to.cy-from.cy);
+    var smid=Math.min(gm.w/(dx+1500),gm.h/(dy+1100)),slin=Math.exp((Math.log(from.s)+Math.log(to.s))/2);
+    var dip=cl(1-smid/slin,.12,.8);
+    var s=Math.exp(Math.log(from.s)*(1-e)+Math.log(to.s)*e)*(1-dip*Math.sin(Math.PI*e));
+    cam={cx:from.cx+(to.cx-from.cx)*e,cy:from.cy+(to.cy-from.cy)*e,s:s,g:to.g,i:p<.5?from.i:to.i};
+    ee=e;
+    if(p>=1){anim=false;cam=to;if(cur===N-1)stampAt=now}
+  }
+  var g=cam.g,vx=cam.cx-(g.x+g.w/2)/cam.s,vy=cam.cy-(g.y+g.h/2)/cam.s;
+  sv.setAttribute('viewBox',vx.toFixed(2)+' '+vy.toFixed(2)+' '+(W/cam.s).toFixed(2)+' '+(H/cam.s).toFixed(2));
+  /* focus des détails */
+  var fz=anim?ZF[from.i]:ZF[cur],tz=ZF[cur];
+  var dimF=(fz>=0?1-ee:0)+(tz>=0?ee:0);
+  for(var i=0;i<zones.length;i++){var o=(fz===i?1-ee:0)+(tz===i?ee:0);brk[i].setAttribute('opacity',(o*(.75+.25*Math.sin(t*3))).toFixed(3));zones[i].setAttribute('opacity',(1-dimF*(1-o)*.72).toFixed(3))}
+  /* tampon */
+  if(stampAt>0){var q=sm((now-stampAt-150)/420);var sc=1+(1-q)*1.8;stamp.setAttribute('opacity',q.toFixed(3));stamp.setAttribute('transform','translate(3700 2560) rotate(-9) scale('+sc.toFixed(3)+')');
+    if(q>=.999&&!stamped){stamped=true;if(!RM){sv.classList.remove('shake');void sv.getBoundingClientRect();sv.classList.add('shake')}}}
+  else stamp.setAttribute('opacity',0);
+  /* animations */
+  if(!RM&&loop){var L=loop.getTotalLength(),pp=loop.getPointAtLength(((t*.045)%1)*L),p2=loop.getPointAtLength((((t*.045)%1)*L+4)%L),ang=Math.atan2(p2.y-pp.y,p2.x-pp.x)*57.3;bus.setAttribute('transform','translate('+pp.x.toFixed(1)+' '+pp.y.toFixed(1)+') rotate('+ang.toFixed(1)+')')}
+  else if(loop&&!bus.getAttribute('transform')){var p0=loop.getPointAtLength(0);bus.setAttribute('transform','translate('+p0.x+' '+p0.y+')')}
+  peds.forEach(function(d){if(!RM){d.x+=d.v*.016;if(d.x>1625)d.x=755}
+    var w=sm(1-Math.abs(d.x-1225)/150),yc=d.lane>2318?2262+(d.lane-2262)*.42:d.lane,y=d.lane+(yc-d.lane)*w;
+    d.c.setAttribute('cx',d.x.toFixed(1));d.c.setAttribute('cy',y.toFixed(1))});
+  var wx=mx>=0?vx+mx/cam.s:cam.cx,wy=my>=0?vy+my/cam.s:cam.cy;
+  xy.textContent='X '+fmt(wx*.283)+' · Y '+fmt(((wy>3020?O2+2970:2970)-wy)*.283)+' · ';
+  zm.textContent='Zoom '+Math.round(cam.s*100)+' %';
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* réticule de DAO */
+var xh=document.getElementById('xh'),xv=document.getElementById('xv'),pick=document.getElementById('pick');
+if(!RM&&matchMedia('(pointer:fine)').matches){
+  sv.addEventListener('pointermove',function(e){mx=e.clientX;my=e.clientY;document.body.classList.add('cad');xh.style.top=my+'px';xv.style.left=mx+'px';pick.style.left=mx+'px';pick.style.top=my+'px'});
+  sv.addEventListener('pointerleave',function(){mx=my=-1;document.body.classList.remove('cad')});
+}
+})();
+</script>
+</body>
+</html>
