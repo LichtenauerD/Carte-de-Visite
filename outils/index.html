@@ -15,10 +15,12 @@
   --sans:'Montserrat','Helvetica Neue',Arial,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;color-scheme:dark}
 *{box-sizing:border-box}
 html{background:var(--bg)}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);position:relative;color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.wrap{max-width:1180px;margin:0 auto;padding:0 max(18px,4vw)}
+.bgmap{position:fixed;inset:0;z-index:0;pointer-events:none;background:url(fond-carte.svg) center/cover no-repeat;opacity:.55}
+.bgmap:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,20,38,.55),rgba(11,20,38,.15) 45%,rgba(11,20,38,.55))}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 max(18px,4vw)}
 nav{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px 0;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 nav a{text-decoration:none;display:inline-flex;align-items:center;gap:8px}
 nav a:hover{color:var(--gold-2)}
@@ -58,6 +60,7 @@ ul.pts li:before{content:"";position:absolute;left:2px;top:19px;width:8px;height
 </style>
 </head>
 <body>
+<div class="bgmap" aria-hidden="true"></div>
 <div class="wrap">
   <nav>
     <a class="brand" href="../"><i>D</i>Dorian Lichtenauer</a>
