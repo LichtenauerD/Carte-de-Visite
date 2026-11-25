@@ -237,8 +237,8 @@ body.cad #sv{cursor:none}
       <p class="ref">Détail 7 / 8 · Stationnement</p>
       <h2>Diagnostiquer le <em>stationnement</em></h2>
       <p class="kick">Offre et demande à l'IRIS</p>
-      <p class="lead">Comparer le nombre de voitures des ménages à l'offre réellement recensée, privée et publique, puis suivre le taux d'occupation par zone au fil de la journée.</p>
-      <ul class="pl"><li><button data-k="15"><span>P7.1</span>IRIS Van Gogh / Montaigne<em>↗</em></button></li><li><button data-k="16"><span>P7.2</span>IRIS Centre-Ouest<em>↗</em></button></li><li><button data-k="17"><span>P7.3</span>IRIS Cité Nouvelle Barbusse<em>↗</em></button></li><li><button data-k="18"><span>P7.4</span>Taux d'occupation par tranche horaire<em>↗</em></button></li></ul>
+      <p class="lead">Comparer le nombre de voitures des ménages à l'offre réellement recensée, privée et publique.</p>
+      <ul class="pl"><li><button data-k="15"><span>P7.1</span>IRIS Van Gogh / Montaigne<em>↗</em></button></li><li><button data-k="16"><span>P7.2</span>IRIS Centre-Ouest<em>↗</em></button></li><li><button data-k="17"><span>P7.3</span>IRIS Cité Nouvelle Barbusse<em>↗</em></button></li></ul>
       <p class="tools">INSEE IRIS · Inventaire de l'offre · QGIS</p>
     </section>
     <section class="card">
@@ -246,7 +246,7 @@ body.cad #sv{cursor:none}
       <h2>Valoriser le <em>territoire</em></h2>
       <p class="kick">Ardennes</p>
       <p class="lead">Parc naturel régional, voie verte Trans-Ardennaise et principaux sites touristiques du département.</p>
-      <ul class="pl"><li><button data-k="19"><span>P8.1</span>Ardennes, sites touristiques<em>↗</em></button></li></ul>
+      <ul class="pl"><li><button data-k="18"><span>P8.1</span>Ardennes, sites touristiques<em>↗</em></button></li></ul>
       <p class="tools">QGIS</p>
     </section>
     <section class="card" data-i="5">
@@ -407,10 +407,9 @@ var PL=[
  {id:'55',z:4,x:1739,y:O2+500,w:422,h:660,r:'P5.3',s:'Meuse (55)',c:"Réseau interurbain de la Meuse (55) : lignes de bus régionales, lignes ferroviaires et connexions vers les territoires voisins"},
  {id:'88',z:4,x:2207,y:O2+500,w:1031,h:660,r:'P5.4',s:'Vosges (88)',c:"Réseau interurbain des Vosges (88) : lignes de bus régionales, lignes ferroviaires et connexions vers les territoires voisins"},
  {id:'besancon',z:5,x:140,y:790,w:556,h:786,r:'P1.1',s:'Besançon, 6 couches',c:"Analyse de site à Besançon, rayon de 1 150 m : six couches thématiques en axonométrie (OpenStreetMap, IGN BD TOPO, RGE ALTI), réalisée avec un outil d'analyse de site développé en HTML / JavaScript"},
- {id:'montaigne',z:6,x:140,y:O2+1450,w:928,h:560,r:'P7.1',s:'IRIS Montaigne',c:"Adéquation entre offre et demande de stationnement, IRIS Van Gogh / Montaigne : 925 ménages, 1 045 voitures, 560 places privées et 570 places publiques"},
- {id:'centreouest',z:6,x:1110,y:O2+1450,w:923,h:560,r:'P7.2',s:'IRIS Centre-Ouest',c:"Adéquation entre offre et demande de stationnement, IRIS Centre-Ouest : 1 374 ménages, 1 339 voitures, 769 places privées et 652 places publiques"},
- {id:'barbusse',z:6,x:2075,y:O2+1450,w:859,h:560,r:'P7.3',s:'Cité Barbusse',c:"Adéquation entre offre et demande de stationnement, IRIS Cité Nouvelle Barbusse : 937 ménages, 662 voitures, 700 places privées et 630 places publiques"},
- {id:'occup',z:6,x:2976,y:O2+1450,w:264,h:560,r:'P7.4',s:'Occupation',c:"Taux d'occupation moyen du stationnement par zone et par tranche horaire, d'avant 8 h à après 19 h"},
+ {id:'montaigne',z:6,x:293,y:O2+1450,w:928,h:560,r:'P7.1',s:'IRIS Montaigne',c:"Adéquation entre offre et demande de stationnement, IRIS Van Gogh / Montaigne : 925 ménages, 1 045 voitures, 560 places privées et 570 places publiques"},
+ {id:'centreouest',z:6,x:1263,y:O2+1450,w:923,h:560,r:'P7.2',s:'IRIS Centre-Ouest',c:"Adéquation entre offre et demande de stationnement, IRIS Centre-Ouest : 1 374 ménages, 1 339 voitures, 769 places privées et 652 places publiques"},
+ {id:'barbusse',z:6,x:2228,y:O2+1450,w:859,h:560,r:'P7.3',s:'Cité Barbusse',c:"Adéquation entre offre et demande de stationnement, IRIS Cité Nouvelle Barbusse : 937 ménages, 662 voitures, 700 places privées et 630 places publiques"},
  {id:'tourisme',z:7,x:3320,y:O2+1800,w:740,h:740,r:'P8.1',s:'Ardennes, tourisme',c:"Ardennes : parc naturel régional, voie verte Trans-Ardennaise et principaux sites touristiques"}
 ];
 PL.forEach(function(p,k){
