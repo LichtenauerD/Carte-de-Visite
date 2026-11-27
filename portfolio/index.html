@@ -75,8 +75,8 @@ body.cad #sv{cursor:none}
 #panel .ph{flex:none;display:flex;justify-content:space-between;align-items:center;height:42px;padding:0 22px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 #panel .ph b{color:var(--gold);font-weight:500}
 #cards{position:relative;flex:1;min-height:0}
-.card{position:absolute;inset:0;padding:30px 26px 18px;overflow:auto;opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .5s ease,transform .7s cubic-bezier(.2,.7,.2,1),visibility 0s linear .5s}
-.card.on{opacity:1;visibility:visible;transform:none;transition:opacity .7s ease .35s,transform .9s cubic-bezier(.2,.7,.2,1) .35s,visibility 0s}
+.card{position:absolute;inset:0;padding:30px 26px 18px;overflow:auto;opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .25s ease,transform .4s cubic-bezier(.2,.7,.2,1),visibility 0s linear .25s}
+.card.on{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease .15s,transform .55s cubic-bezier(.2,.7,.2,1) .15s,visibility 0s}
 .ref{margin:0 0 12px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
 .card h1,.card h2{margin:0;font-weight:700;line-height:1.08;letter-spacing:-.01em;color:var(--text)}
 .card h1{font-size:34px}
@@ -596,7 +596,7 @@ var ZF=[-1,5,0,1,2,-1,4,3,6,7,-1,-1,-1];
 var CMD=['_ZOOM _ÉTENDU  planche 01','_ZOOM _FENÊTRE  détail 1, analyse de site','_ZOOM _FENÊTRE  détail 2, lire le territoire','_ZOOM _FENÊTRE  détail 3, étudier les mobilités','_ZOOM _FENÊTRE  détail 4, étudier l\'espace public','_PAN  planche 02, études complémentaires','_ZOOM _FENÊTRE  détail 5, cartographier les réseaux','_ZOOM _FENÊTRE  détail 6, analyser les données','_ZOOM _FENÊTRE  détail 7, stationnement','_ZOOM _FENÊTRE  détail 8, tourisme','_TABLEAU  synthèse, repères 01 à 03','_TABLEAU  synthèse, repères 04 à 06','_ZOOM _FENÊTRE  cartouche, contact'];
 var NAMES=["Planche 01",'Analyse de site','Lire le territoire','Étudier les mobilités','Étudier l\'espace public','Planche 02','Cartographier les réseaux','Analyser les données','Stationnement','Tourisme','Synthèse','Synthèse','Contact'];
 var TOCL=['P1','D1','D2','D3','D4','P2','D5','D6','D7','D8','S1','S2','Fin'];
-var N=ST.length,W,H,mobile,DUR=RM?1:1800;
+var N=ST.length,W,H,mobile,DUR=RM?1:900;
 function region(){var pw=mobile?0:410;return mobile?{x:0,y:42,w:W,h:H*.52-42}:{x:0,y:42,w:W-pw,h:H-86}}
 function fit(i){var r=ST[i],g=region(),s=Math.min(g.w/r[2],g.h/r[3])*.92;return {cx:r[0]+r[2]/2,cy:r[1]+r[3]/2,s:s,g:g,i:i}}
 var cur=0,from=null,to=null,ta=0,anim=false,cam=null,stampAt=-1,stamped=false,dur=DUR;
@@ -621,7 +621,7 @@ function go(i){
   if(i<0||i>=N)return;
   if(i===cur&&!anim)return;
   from={cx:cam.cx,cy:cam.cy,s:cam.s,g:cam.g,i:cam.i};cur=i;to=fit(i);ta=performance.now();anim=true;
-  var dd=Math.hypot(to.cx-from.cx,to.cy-from.cy);dur=RM?1:DUR*(1+Math.min(dd/4500,.7));
+  var dd=Math.hypot(to.cx-from.cx,to.cy-from.cy);dur=RM?1:DUR*(1+Math.min(dd/6000,.35));
   if(i!==N-1){stampAt=-1;stamped=false}
   setUI(i);hint.classList.add('off');
 }
@@ -665,7 +665,7 @@ function frame(now){
     var p=cl((now-ta)/dur,0,1),e=ease(p);
     var gm=to.g,dx=Math.abs(to.cx-from.cx),dy=Math.abs(to.cy-from.cy);
     var smid=Math.min(gm.w/(dx+1500),gm.h/(dy+1100)),slin=Math.exp((Math.log(from.s)+Math.log(to.s))/2);
-    var dip=cl(1-smid/slin,.12,.8);
+    var dip=cl(1-smid/slin,.08,.5);
     var s=Math.exp(Math.log(from.s)*(1-e)+Math.log(to.s)*e)*(1-dip*Math.sin(Math.PI*e));
     cam={cx:from.cx+(to.cx-from.cx)*e,cy:from.cy+(to.cy-from.cy)*e,s:s,g:to.g,i:p<.5?from.i:to.i};
     ee=e;
